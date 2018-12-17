@@ -57,12 +57,23 @@ function obtenerResultados(value) {
         function(response) {
             console.log('el resultado es ->>');
             console.log(response);
-            console.log(response.outputs[0].data.colors);
+            console.log(response.outputs[0].data.colors[0].w3c.name);
 
+            let colorA = response.outputs[0].data.colors[0].w3c.name;
+            let colorB = response.outputs[0].data.colors[1].w3c.name;
 
-            document.getElementById('res1').innerHTML = 'data del response 1';
-            document.getElementById('res2').innerHTML = 'data del response 1';
-            document.getElementById('res3').innerHTML = 'data del response 1';
+            if (colorA === 'White' || colorA === 'RosyBrown') {
+                document.getElementById('res1').innerHTML = 1 - response.outputs[0].data.colors[0].value;
+                document.getElementById('res2').innerHTML = 1 - response.outputs[0].data.colors[1].value;
+                document.getElementById('res3').innerHTML = 'Si hay mejora';
+            } else {
+
+                document.getElementById('res1').innerHTML = 1 - response.outputs[0].data.colors[0].value;
+                document.getElementById('res2').innerHTML = 1 - response.outputs[0].data.colors[1].value;
+                document.getElementById('res3').innerHTML = 'No hay mejora';
+
+            }
+
         },
         function(err) {
             console.log(err);
