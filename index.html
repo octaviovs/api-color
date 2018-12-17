@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <!-- <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script> -->
+    <script type="text/javascript" src="predict.js"></script>
+    <script type="text/javascript" src="keys.js"></script>
+    <script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-latest.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <title>Seguimiento del paciente</title>
+    <script>
+        try {
+            var app = new Clarifai.App({
+                apiKey: '423bcb08f7ef4a9db0ec7baa8b740bf5'
+            });
+        } catch (err) {
+            alert("Clave incorrecta!");
+            throw "Invalid API Key";
+        }
+
+        // Valida el formato de la imagen
+        function validFile(imageName) {
+            var lowerImageName = imageName.toLowerCase();
+            return lowerImageName.search(/jpg|png|bmp|tiff/gi) != -1;
+        }
+
+        // Fills custom model dropdown
+        window.onload = function() {
+            var select = document.getElementById("custom_models_dropdown");
+
+            app.models.list().then(
+                function(response) {
+                    var ids = response.rawData;
+
+                    for (var i = 0; i < ids.length; i++) {
+                        var model = ids[i];
+                        if (model.app_id != "main") {
+                            var el = document.createElement("option");
+                            el.textContent = model.name;
+                            el.value = model.id;
+                            select.appendChild(el);
+                        }
+                    }
+                },
+                function(err) {
+                    alert(err);
+                }
+            );
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="display-4">Seguimiento del tratamiento</h1>
+            <p class="lead">Para realziar la compracion siga las instrucciones</p>
+            <ol>
+                <li>Carge la imagen</li>
+                <li>De en escanear</li>
+                <li>Espere resultado</li>
+            </ol>
+        </div>
+        <br>
+        <div>
+            <input type="hidden" id="hidden-counter" name="hidden-counter" value="1" />
+            <form action="">
+
+                <input type="radio" name="model" value="color" checked="checked"> Color<br>
+            </form>
+
+            <br>
+        </div>
+
+
+        <div class="input-group mb-3">
+
+
+            <div class="input-group">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input info" id="filename" aria-describedby="inputGroupFileAddon04">
+                    <label class="custom-file-label" for="filename">Seleccione archivo</label>
+                </div>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-warning" type="button" onclick="
+                    if(filename.value == '') { 
+                      alert('Seleccione primero un archivo!'); 
+                      return;
+                    } 
+                    else if (!validFile(filename.value)) {
+                      alert('Formatos aceptados: JPEG, PNG, TIFF, BMP');
+                      return;
+                    }
+                    predict_click($('#filename').val(), 'file');">Revisar</button>
+                </div>
+            </div>
+            <br>
+
+
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Primera foto</th>
+                        <th scope="col">Foto Actual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <img src="mano.jpg" class="img-fluid rounded float-left" alt="Responsive image" style="width:350px;height:350px;">
+                        </td>
+                        <td>
+                            <img id="img_preview1" src="" class="img-fluid" alt="Responsive image" style="width:350px;height:350px;" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card" style="width: 18rem;">
+                <div class="card-header">
+                    Resultados
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Tanalidad clara :<label id="res1"></label> </li>
+                    <li class="list-group-item">Tonalidad oscura:<label id="res2"></label> </li>
+                    <li class="list-group-item">Resultado (mejoro / no mejoro):<label id="res3"></label> </li>
+                </ul>
+            </div>
+
+            <div id="predictions">
+            </div>
+
+        </div>
+</body>
+
+</html>
